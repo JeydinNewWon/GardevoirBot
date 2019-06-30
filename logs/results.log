@@ -1,0 +1,18 @@
+{"level":"info","message":"Attempting to log in...","timestamp":"20:43:14"}
+{"level":"info","message":"Using bot token: MjkxODYyNDMzMDU0NzIwMDAx.XRGKig.fyMdO7DSgjn07rpYSEPH12DBxz4","timestamp":"20:43:14"}
+{"level":"info","message":"Finished initialisation.","timestamp":"20:43:14"}
+{"level":"info","message":"Set status to online","timestamp":"20:43:16"}
+{"level":"info","message":"Successfully logged into Discord.","timestamp":"20:43:16"}
+{"level":"info","message":"Logged in as Gardevoir#3008. ID: 291862433054720001","timestamp":"20:43:16"}
+{"level":"info","message":"Attempting to load commands...","timestamp":"20:43:17"}
+{"level":"info","message":"Loaded commands pause, play, resume, skip, spam, stop","timestamp":"20:43:17"}
+{"level":"warn","message":"No video search query given.","timestamp":"20:43:45"}
+{"level":"warn","message":"Insufficient permissions to join voice channel.","timestamp":"20:44:01"}
+{"level":"warn","message":"Insufficient permissions to connect or speak in the voice channel.","timestamp":"20:44:55"}
+{"level":"warn","message":"Insufficient permissions to connect or speak in the voice channel.","timestamp":"20:45:15"}
+{"level":"warn","message":"Insufficient permissions to connect or speak in the voice channel.","timestamp":"20:45:26"}
+{"level":"warn","message":"Insufficient permissions to connect or speak in the voice channel.","timestamp":"20:45:51"}
+{"level":"info","message":"Created new Queue. ID: 360388906061135884","timestamp":"20:46:04"}
+{"level":"info","message":"Saved song: When leblanc gets reverted to the database.","timestamp":"20:46:09"}
+{"level":"info","message":"Deleted all Queues.","timestamp":"20:47:48"}
+{"level":"info","message":"Deleted all Songs.","timestamp":"20:47:48"}

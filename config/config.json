@@ -1,0 +1,10 @@
+{
+    "owner_id": "253803512369119233",
+    "bot_token": "MjkxODYyNDMzMDU0NzIwMDAx.XRGKig.fyMdO7DSgjn07rpYSEPH12DBxz4",
+    "fail_emoji": ":no_entry_sign:",
+    "success_emoji": ":white_check_mark:",
+    "music_add_emoji": ":musical_note:",
+    "command_prefix": "g.",
+    "youtubeAPIkey": ".",
+    "mongodburl": "mongodb://localhost:27017/gardevoir"
+}
