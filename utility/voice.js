@@ -15,15 +15,12 @@ function playSongFirst(msg, voiceConnection, searchQuery, cb) {
         if (err) {
             return cb(err);
         }
-
         createSong(msg, searchQuery, (err, song) => {
             if (err) {
                 return cb(err);
             }
-
             var audioStream = ytdl(song.url, { filter: 'audio' });
             var dispatcher = voiceConnection.playStream(audioStream);
-
             addSongToQueue(msg, guildId, song, (err, url) => {
                 if (err) {
                     return cb(err);
@@ -59,7 +56,6 @@ function skipSong(msg, voiceConnection, cb) {
         if (err) {
             return cb(err);
         }
-        
         if (Queue.repeat) {
             setRepeat(msg, () => {
                 voiceConnection.dispatcher.end('skip');
@@ -87,7 +83,6 @@ function addSkipVote(msg, voiceConnection, cb) {
                 if (err) {
                     return cb(err);
                 }
-                
                 Queue.checkVotes(voiceConnection.channel.members.size, (err, isEnoughVotes) => {
                     if (err) {
                         return cb(err);
@@ -103,7 +98,6 @@ function addSkipVote(msg, voiceConnection, cb) {
         }
     });
 }
-
 
 function stopPlaying(msg, voiceConnection, cb) {
     voiceConnection.dispatcher.end('stop');
@@ -153,7 +147,6 @@ function checkQueues(guildId, cb) {
             logger.error('Error in finding Queue');
             return cb(err);
         }
-
         if (!res) {
             var queue = new queueModel({
                 guildId: guildId,
@@ -161,7 +154,6 @@ function checkQueues(guildId, cb) {
                 repeat: false,
                 skipVotes: []
             });
-
             queue.save((err) => {
                 if (err) {
                     logger.error('Error in creating Queue');
@@ -182,7 +174,6 @@ function createSong(msg, searchQuery, cb) {
         if (err) {
             return cb(err);
         }
-
         var song = {
             guildId: msg.guild.id,
             title: data.title,
@@ -192,7 +183,7 @@ function createSong(msg, searchQuery, cb) {
             url: data.url,
             thumbnail: data.thumbnail
         };
-
+        logger.info(`Saved song: ${song.title} to the database.`);
         cb(null, song);
         /*
         song.save((err) => {
@@ -209,7 +200,6 @@ function addSongToQueue(msg, guildId, song, cb) {
         if (err) {
             return cb(err);
         }
-
         Queue.addSong(song, (err) => {
             if (err) {
                 return cb(err);
@@ -253,7 +243,6 @@ function removeOldestSong(guildId, cb) {
         if (err) {
             return cb(err);
         }
-
         if (Queue.repeat) {
             cb(null, Queue.songs);
         } else {
