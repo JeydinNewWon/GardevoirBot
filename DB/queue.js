@@ -45,7 +45,7 @@ queueSchema.methods.checkVotes = function checkVote(totalMembers, cb) {
 
 queueSchema.methods.setRepeat = function setRepeat(cb) {
     this.model('Queues').updateOne({ _id: this._id }, { $set: { repeat: !this.repeat } }, (err) => {
-        cb(err);
+        cb(err, !this.repeat);
     });
 }
 

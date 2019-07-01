@@ -5,13 +5,12 @@ const ownerId = config.owner_id;
 
 function execute(msg) {
     if (msg.author.id === ownerId) {
-        voice.skipSong(msg.guild.voiceConnection, () => {
+        voice.skipSong(msg, msg.guild.voiceConnection, () => {
             return logger.info(`Skipped song in guild: ${msg.guild.name} ID: ${msg.guild.id}`);
         });
     } else {
         
     }
-
 }
 
 module.exports = {

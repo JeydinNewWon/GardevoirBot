@@ -4,18 +4,18 @@ const fail = config.fail_emoji;
 const success = config.success_emoji;
 const logger = require('../utility/logger');
 const voice = require('../utility/voice');
-const ownerID = config.owner_id;
+
 
 function execute(msg) {
     var voiceConnection = msg.guild.voiceConnection;
     if (voiceConnection) {
         if (msg.member.voiceChannelID === msg.guild.me.voiceChannelID) {
-            voice.stopSong(msg, voiceConnection, (err) => {
+            voice.setRepeat(msg, (err, repeatState) => {
                 if (err) {
                     msg.channel.send(`${fail} ERROR ENCOUNTERED: ${err.message}`);
                     return logger.error(`ERROR ENCOUNTERED: ${err.message}`);
                 }
-                msg.channel.send(`${success} Cleared the queue.`);
+                msg.channel.send(`:repeat: Set repeat state to **${repeatState}**.`);
             });
         } else {
             msg.channel.send(`${fail} You must be in the same channel to stop the bot.`);
@@ -30,6 +30,6 @@ function execute(msg) {
 }
 
 module.exports = {
-    "name": "stop",
+    "name": "repeat",
     "execute": execute
 }

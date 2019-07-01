@@ -1,3 +1,4 @@
+const Discord = require('discord.js');
 const config = require('../config/config.json');
 const logger = require('./logger');
 const youtubeSearch = require('./youtube');
@@ -33,7 +34,6 @@ function playSongFirst(msg, voiceConnection, searchQuery, cb) {
                     if (err) {
                         return cb(err);
                     }
-                    msg.channel.send(`${success} No more songs to play. Exited the channel.`);
                 });
             });
         });
@@ -54,9 +54,62 @@ function addSong(msg, searchQuery, cb) {
     });
 }
 
-function skipSong(voiceConnection, cb) {
-    voiceConnection.dispatcher.end();
-    cb();
+function skipSong(msg, voiceConnection, cb) {
+    queueModel.findOne({ guildId: msg.guild.id }, (err, Queue) => {
+        if (Queue.repeat) {
+            setRepeat(msg, () => {
+                voiceConnection.dispatcher.end('skip');
+                setRepeat(msg, () => {
+                    cb();
+                });
+            });
+        } else {
+            voiceConnection.dispatcher.end('skip');
+            cb();
+        }
+    });
+}
+
+function stopPlaying(msg, voiceConnection, cb) {
+    voiceConnection.dispatcher.end('stop');
+    clearQueuesAndSongs(msg, msg.guild.id, (err) => {
+        if (err) {
+            return cb(err);
+        }
+        cb();
+    });
+}
+
+
+function setRepeat(msg, cb) {
+    queueModel.findOne({ guildId: msg.guild.id }, (err, Queue) => {
+        if (err) {
+            return cb(err);
+        }
+        Queue.setRepeat((err, repeatState) => {
+            if (err) {
+                return cb(err);
+            }
+            cb(err, repeatState);
+        });
+    });
+}
+
+function clearQueuesAndSongs(msg, guildId, cb) {
+    queueModel.deleteOne({ guildId: guildId }, (err) => {
+        if (err) {
+            logger.info(`Error in deleting songs in Guild: ${msg.guild.name} ID:${guildId}`);
+            return cb(err);
+        }
+        songModel.deleteMany({ guildId: guildId }, (err) => {
+            if (err) {
+                logger.error(`Error in deleting songs in Guild: ${msg.guild.name} ID:${guildId}`);
+                return cb(err);
+            }
+            logger.info(`Deleted all songs in Guild: ${msg.guild.name} ID:${guildId}`);
+            cb();
+        });
+    });
 }
 
 function checkQueues(guildId, cb) {
@@ -95,22 +148,24 @@ function createSong(msg, searchQuery, cb) {
             return cb(err);
         }
 
-        var song = new songModel({
+        var song = {
+            guildId: msg.guild.id,
             title: data.title,
             duration: data.duration,
             addedBy: msg.author.tag,
-            addedById: msg.author.id,
+            addedByAvatar: msg.author.avatarURL,
             url: data.url,
             thumbnail: data.thumbnail
-        });
+        };
 
+        cb(null, song);
+        /*
         song.save((err) => {
             if (err) {
                 return cb(err);
             }
-            cb(null, song);
             logger.info(`Saved song: ${data.title} to the database.`);
-        });
+        });*/
     });
 }
 
@@ -131,42 +186,91 @@ function addSongToQueue(msg, guildId, song, cb) {
 }
 
 function nextSong(msg, dispatcher, voiceConnection, guildId, cb) {
-    dispatcher.on('end', () => {
-        removeOldestSong(guildId, (err, songs) => {
-            if (err) {
-                return cb(err);
-            }
-            if (songs.length > 0) {
-                var url = songs[0].url;
-                var audioStream = ytdl(url, { filter: 'audio' });
-                var newDispatcher = voiceConnection.playStream(audioStream);
-                msg.channel.send(`**Now playing: ** \`${songs[0].title}\``);
-                nextSong(msg, newDispatcher, voiceConnection, guildId, cb);
-            } else {
-                voiceConnection.disconnect();
-                voiceConnection.channel.leave();
-                cb();
-            }
-        });
+    dispatcher.on('end', (reason) => {
+        if (reason !== "stop") {
+            removeOldestSong(guildId, (err, songs) => {
+                if (err) {
+                    return cb(err);
+                }
+                if (songs.length > 0) {
+                    var url = songs[0].url;
+                    var audioStream = ytdl(url, { filter: 'audio' });
+                    var newDispatcher = voiceConnection.playStream(audioStream);
+                    msg.channel.send(`**Now playing: ** \`${songs[0].title}\``);
+                    nextSong(msg, newDispatcher, voiceConnection, guildId, cb);
+                } else {
+                    voiceConnection.disconnect();
+                    voiceConnection.channel.leave();
+                    msg.channel.send(`${success} No more songs to play. Exited the channel.`);
+                    cb();
+                }
+            });
+        } else {
+            voiceConnection.disconnect();
+            voiceConnection.channel.leave();
+            msg.channel.send(`${success} Exited the channel.`);
+        }
     });
 }
 
 function removeOldestSong(guildId, cb) {
-    queueModel.findOne({ guildId: guildId}, (err, Queue) => {
+    queueModel.findOne({ guildId: guildId }, (err, Queue) => {
         if (err) {
             return cb(err);
         }
-        Queue.removeOldest((err, updatedSongs) => {
-            if (err) {
-                return cb(err);
-            }
-            cb(null, updatedSongs);
-        })
+
+        if (Queue.repeat) {
+            cb(null, Queue.songs);
+        } else {
+            Queue.removeOldest((err, updatedSongs) => {
+                if (err) {
+                    return cb(err);
+                }
+                cb(null, updatedSongs);
+            });
+        }
+    });
+}
+
+function currentSong(msg, cb) {
+    queueModel.findOne({ guildId: msg.guild.id }, (err, Queue) => {
+        if (err) {
+            return cb(err);
+        }
+        var currentSong = Queue.songs[0];
+        var songEmbed = new Discord.RichEmbed({
+            author: {
+                name: "Now Playing", 
+                icon_url: currentSong.addedByAvatar
+            },
+            title: currentSong.title,
+            url: currentSong.url,
+            thumbnail: {
+                'url': currentSong.thumbnail
+            },
+            fields: [
+                {
+                    name: 'Added By',
+                    value: currentSong.addedBy,
+                    inline: true
+                },
+                {
+                    name: 'Duration',
+                    value: currentSong.duration,
+                    inline: true
+                }
+            ]
+        });
+        songEmbed.setColor('GREEN');
+        msg.channel.send(songEmbed);
     });
 }
 
 module.exports = {
     "playSongFirst": playSongFirst,
     "addSong": addSong,
-    "skipSong": skipSong
+    "skipSong": skipSong,
+    "stopSong": stopPlaying,
+    "setRepeat": setRepeat,
+    "currentSong": currentSong
 }

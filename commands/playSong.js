@@ -9,8 +9,9 @@ function execute(msg) {
 
     if (searchQuery && searchQuery !== "") {
         if (voiceChannel) {
-            if (msg.guild.me.hasPermission(['CONNECT', 'SPEAK'])) {
-                if (voiceChannel.memberPermissions(msg.guild.me).has(['CONNECT', 'SPEAK'])) {
+            const requiredPerms = ['CONNECT', 'SPEAK'];
+            if (msg.guild.me.hasPermission(requiredPerms)) {
+                if (voiceChannel.memberPermissions(msg.guild.me).has(requiredPerms)) {
                     if (!voiceChannel.connection) {
                         voiceChannel.join()
                             .then((connection) => {

@@ -4,7 +4,7 @@ const queueModel = require('../DB/queue.js');
 const songModel = require('../DB/song.js');
 
 function closeConnections(bot) {
-    if (bot.voiceConnections.length) {
+    if (bot.voiceConnections.size) {
         queueModel.deleteMany({}, (err) => {
             if (err) {
                 logger.error('Error in deleting the Queues.');
@@ -19,7 +19,6 @@ function closeConnections(bot) {
                 }
                 mongoose.disconnect();
                 bot.voiceConnections.map((voiceConnection) => {
-                    console.log('\n');
                     voiceConnection.disconnect();
                     voiceConnection.channel.leave();
                     logger.info(`disconnected from ${voiceConnection.channel.id}`);

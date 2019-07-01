@@ -27,7 +27,6 @@ function loadCommands() {
 }
 
 function checkCommand(msg) {
-    try {
         var commandName = msg.content.substr(msg.prefix.length).split(' ')[0];
         var command = commands[commandName];
 
@@ -41,10 +40,10 @@ function checkCommand(msg) {
         }
 
         command.execute(msg);
-
-    } catch (err) {
+    
+    /*catch (err) {
         logger.error("Error occured in running command: " + err.message);
-    }
+    }*/
 }
 
 function init() {
