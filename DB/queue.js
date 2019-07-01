@@ -22,20 +22,17 @@ queueSchema.methods.removeOldest = function removeOldest(cb) {
 }
 
 queueSchema.methods.addVote = function addVote(vote, cb) {
-    this.model('Queues').findOne({ _id: this._id }, (err, Queue) => {
-        if (Queue.skipVotes.includes(vote)) {
-            cb(err, false);
-        } else {
-            this.model('Queues').updateOne({ _id: this._id }, { $addToSet: { skipVotes: vote } }, () => {
-                cb(err, true);
-            });
+    this.model('Queues').updateOne({ _id: this._id }, { $addToSet: { skipVotes: vote } }, (err) => {
+        if (err) {
+            return cb(err);
         }
+        cb();
     });
 }
 
 queueSchema.methods.checkVotes = function checkVote(totalMembers, cb) {
     this.model('Queues').findOne({ _id: this._id }, (err, Queue) => { 
-        if (Queue.skipVotes.length > Math.round(totalMembers/2)) {
+        if (Queue.skipVotes.length >= Math.round(totalMembers/2)) {
             cb(err, true);
         } else {
             cb(err, false);

@@ -56,6 +56,10 @@ function addSong(msg, searchQuery, cb) {
 
 function skipSong(msg, voiceConnection, cb) {
     queueModel.findOne({ guildId: msg.guild.id }, (err, Queue) => {
+        if (err) {
+            return cb(err);
+        }
+        
         if (Queue.repeat) {
             setRepeat(msg, () => {
                 voiceConnection.dispatcher.end('skip');
@@ -69,6 +73,37 @@ function skipSong(msg, voiceConnection, cb) {
         }
     });
 }
+
+function addSkipVote(msg, voiceConnection, cb) {
+    var vote = msg.author.id;
+    queueModel.findOne({ guildId: msg.guild.id }, (err, Queue) => {
+        if (err) {
+            return cb(err);
+        }
+        if (Queue.skipVotes.includes(vote)) {
+            msg.channel.send(`${fail} You've already voted to skip.`);
+        } else {
+            Queue.addVote(vote, (err) => {
+                if (err) {
+                    return cb(err);
+                }
+                
+                Queue.checkVotes(voiceConnection.channel.members.size, (err, isEnoughVotes) => {
+                    if (err) {
+                        return cb(err);
+                    }
+                    if (isEnoughVotes) {
+                        msg.channel.send(`:track_next: Skipping song...`);
+                        skipSong(msg, voiceConnection, cb);
+                    } else {
+                        msg.channel.send(`${success} Vote successfully added.`);
+                    }
+                });
+            });
+        }
+    });
+}
+
 
 function stopPlaying(msg, voiceConnection, cb) {
     voiceConnection.dispatcher.end('stop');
@@ -269,6 +304,7 @@ function currentSong(msg, cb) {
 module.exports = {
     "playSongFirst": playSongFirst,
     "addSong": addSong,
+    "addSkipVote": addSkipVote,
     "skipSong": skipSong,
     "stopSong": stopPlaying,
     "setRepeat": setRepeat,
