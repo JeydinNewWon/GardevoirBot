@@ -83,16 +83,26 @@ function addSkipVote(msg, voiceConnection, cb) {
                 if (err) {
                     return cb(err);
                 }
-                Queue.checkVotes(voiceConnection.channel.members.size, (err, isEnoughVotes) => {
+                queueModel.findOne({ _id: Queue._id }, (err, updatedQueue) => {
                     if (err) {
                         return cb(err);
                     }
-                    if (isEnoughVotes) {
-                        msg.channel.send(`:track_next: Skipping song...`);
-                        skipSong(msg, voiceConnection, cb);
-                    } else {
-                        msg.channel.send(`${success} Vote successfully added.`);
-                    }
+                    updatedQueue.checkVotes(voiceConnection.channel.members.size, (err, isEnoughVotes) => {
+                        if (err) {
+                            return cb(err);
+                        }
+                        if (isEnoughVotes) {
+                            msg.channel.send(`:track_next: Skipping song...`);
+                            updatedQueue.resetVotes((err) => {
+                                if (err) {
+                                    return cb(err);
+                                }
+                                skipSong(msg, voiceConnection, cb);
+                            });
+                        } else {
+                            msg.channel.send(`${success} Vote successfully added.`);
+                        }
+                    });
                 });
             });
         }

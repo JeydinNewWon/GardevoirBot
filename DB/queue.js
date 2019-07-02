@@ -40,6 +40,15 @@ queueSchema.methods.checkVotes = function checkVote(totalMembers, cb) {
     });
 }
 
+queueSchema.methods.resetVotes = function resetVotes(cb) {
+    this.model('Queues').updateOne({ _id: this._id }, { $set: { skipVotes: [] } }, (err) => {
+        if (err) {
+            return cb(err);
+        }
+        cb();
+    });
+}
+
 queueSchema.methods.setRepeat = function setRepeat(cb) {
     this.model('Queues').updateOne({ _id: this._id }, { $set: { repeat: !this.repeat } }, (err) => {
         cb(err, !this.repeat);
