@@ -6,7 +6,8 @@ const Discord = require('discord.js');
 
 function execute(msg) {
     var args = msg.content.substr(msg.prefix.length+4).toLowerCase();
-    if (!args) {
+
+    if (args.length !== 0) {
 
         if (args.includes('-')) {
             args = args.split('-');
@@ -43,7 +44,6 @@ function execute(msg) {
             var species = pokemonEntry.species;
             var evoLine = `**${capitalizeFirstLetter(species)}**`;
             var preEvos = "";
-            console.log(pokemonEntry.prevo);
             if (pokemonEntry.prevo) {
                 preEvos = preEvos + capitalizeFirstLetter(pokemonEntry.prevo) + " > ";
                 var preEntry = pokedex[pokemonEntry.prevo];
@@ -51,7 +51,6 @@ function execute(msg) {
                     preEvos = capitalizeFirstLetter(preEntry.prevo) + " > " + preEvos;
                 }
                 evoLine = preEvos + evoLine;
-                console.log(preEvos);
             }
     
             var evos = "";
@@ -86,8 +85,6 @@ function execute(msg) {
             for (let i in pokemonEntry.baseStats) {
                 totalStats += pokemonEntry.baseStats[i];
             }
-    
-            console.log(embedColours[pokemonEntry.color]);
     
             var embed = new Discord.RichEmbed({
                 color: embedColours[pokemonEntry.color],
