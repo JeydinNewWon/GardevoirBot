@@ -6,7 +6,7 @@ const ownerId = config.owner_id;
 function execute(msg) {
     var voiceConnection = msg.guild.voiceConnection;
     if (voiceConnection) {
-        if (msg.author.id === '1') {
+        if (msg.author.id === ownerId) {
             voice.skipSong(msg, voiceConnection, () => {
                 logger.info(`Skipped song in guild: ${msg.guild.name} ID: ${msg.guild.id} by the owner.`);
             });
