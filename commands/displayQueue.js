@@ -1,14 +1,11 @@
-const config = require('../config/config.json');
-const request = require('request');
-const fail = config.fail_emoji;
-const success = config.success_emoji;
-const logger = require('../utility/logger');
 const voice = require('../utility/voice');
+const config = require('../config/config.json');
+const logger = require('../utility/logger');
 
 function execute(msg) {
     var voiceConnection = msg.guild.voiceConnection;
     if (voiceConnection) {
-        voice.currentSong(msg, (err) => {
+        voice.serverQueue(msg, (err) => {
             if (err) {
                 msg.channel.send(`${fail} ERROR ENCOUNTERED: ${err.message}`);
             }
@@ -21,6 +18,6 @@ function execute(msg) {
 }
 
 module.exports = {
-    "name": "current",
+    "name": "queue",
     "execute": execute
 }

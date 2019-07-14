@@ -302,6 +302,29 @@ function currentSong(msg, cb) {
     });
 }
 
+function serverQueue(msg, cb) {
+    var guildId = msg.guild.id;
+    queueModel.findOne({ guildId: guildId }, (err, Queue) => {
+        if (err) {
+            return cb(err);
+        }
+        var songsArray = [];       
+        Queue.songs.forEach((song) => {
+            songsArray.push({
+                name: song.title,
+                value: `${song.duration}`,
+                inline: false
+            });
+        });
+        var queueEmbed = new Discord.RichEmbed({
+            fields: songsArray
+        });
+        queueEmbed.setColor('GREEN');
+        msg.channel.send(queueEmbed);
+        cb();
+    });
+}
+
 module.exports = {
     "playSongFirst": playSongFirst,
     "addSong": addSong,
@@ -309,5 +332,6 @@ module.exports = {
     "skipSong": skipSong,
     "stopSong": stopPlaying,
     "setRepeat": setRepeat,
-    "currentSong": currentSong
+    "currentSong": currentSong,
+    "serverQueue": serverQueue
 }
