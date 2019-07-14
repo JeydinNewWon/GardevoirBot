@@ -1,5 +1,6 @@
 const voice = require('../utility/voice');
 const config = require('../config/config.json');
+const fail = config.fail_emoji;
 const logger = require('../utility/logger');
 
 function execute(msg) {
