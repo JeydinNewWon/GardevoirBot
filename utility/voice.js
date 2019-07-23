@@ -88,7 +88,6 @@ function addSkipVote(msg, voiceConnection, cb) {
                         return cb(err);
                     }
                     var members = voiceConnection.channel.members.filter(member => !member.user.bot);
-                    console.log(members.size);
                     updatedQueue.checkVotes(members.size, (err, isEnoughVotes) => {
                         if (err) {
                             return cb(err);
