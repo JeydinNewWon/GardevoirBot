@@ -1,5 +1,5 @@
 const youtubedl = require('youtube-dl');
-const options = ["--default-search=auto"];
+const options = ["--default-search=auto", "--force-ipv4"];
 
 function youtubeSearch(searchQuery, cb) {
     youtubedl.getInfo(searchQuery, options, (err, info) => {
