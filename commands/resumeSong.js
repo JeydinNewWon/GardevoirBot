@@ -8,7 +8,7 @@ function execute(msg) {
     var voiceChannel = msg.member.voiceChannel;
     var voiceConnection = voiceChannel.connection;
     if (voiceChannel || voiceConnection) {
-        if (voiceConnection.speaking && voiceConnection.dispatcher) {
+        if (voiceConnection.dispatcher) {
             voiceConnection.dispatcher.resume();
             msg.channel.send(`${success} Resumed current song.`);
             logger.info('Resumed the song.');

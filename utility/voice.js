@@ -120,7 +120,6 @@ function stopPlaying(msg, voiceConnection, cb) {
     });
 }
 
-
 function setRepeat(msg, cb) {
     queueModel.findOne({ guildId: msg.guild.id }, (err, Queue) => {
         if (err) {
