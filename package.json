@@ -19,7 +19,7 @@
     "node-opus": "^0.2.9",
     "request": "^2.88.0",
     "winston": "^2.4.4",
-    "youtube-dl": "^2.0.0",
+    "youtube-dl": "^2.0.1",
     "ytdl-core": "^0.29.2"
   }
 }
